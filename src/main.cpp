@@ -1,21 +1,8 @@
-#include <stdlib.h>
-#include <conio.h>
-#include <iostream>
-#include <time.h>
-#include <dos.h>
+
 #include <stdio.h>
-#include <string.h>
-#include <fstream>
 #include <math.h>
 
 #include <bch.h>
-
-#define MAXR 192 // max r bits
-#define P 8      // degree of parallelism
-#define MAXN ((1<<16)-1)  // primitive code length
-#define MAXT 12         // Max corrective capacity
-#define DRIFT 0 // adding extra errors
-
 
 #ifndef TESTENC
 #define TESTDEC
@@ -27,43 +14,7 @@
 /****************************************************************************/
 /*********************** Global Variable  **********************************/
 /***************************************************************************/
-
-int codeword[MAXN],
-	message[MAXN]; // information bits
-
-int err[MAXT+DRIFT];          // array of random error location
-FILE *o3;
-
-
-/****************************************************************************/
-/*********************** Polynomial Generators *****************************/
-/***************************************************************************/
-// Note: only used by algorithm emulating the serial architecture (n-clock cycles)
-
-const unsigned int gen12[] =
-{1,1,1,0,0,1,1,1,1,0,1,0,1,0,1,0,0,1,0,0,0,0,0,0,0,1,1,0,0,1,1,0,
- 1,1,1,0,1,1,1,1,1,0,1,0,0,0,0,1,1,1,1,0,0,0,1,0,1,1,0,0,0,0,0,0,
- 1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,0,1,0,1,1,0,0,0,0,1,1,1,0,1,1,
- 0,0,0,1,1,0,1,1,0,0,1,1,0,1,0,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,1,0,
- 0,0,1,1,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1,1,1,0,1,0,0,0,1,0,0,0,0,1,
- 1,1,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,1,0,0,1,0,0,0,1,1,1,0,0,1,0,
- 1};
-// i.e. gen(x) = a_0*x^0 + a_1*x^1 + ... + a_(r-1)*x^(r-1) + a_r*x^r
-
-const unsigned int gen10[] =
-{1,0,0,0,1,0,0,1,1,0,1,0,0,1,1,0,1,1,0,1,1,1,0,1,0,0,0,1,1,1,0,1,
- 1,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,1,0,0,0,1,0,1,1,1,1,1,1,0,1,1,1,
- 1,1,0,0,0,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,1,1,1,0,0,1,0,1,0,1,1,0,
- 1,1,1,1,1,0,0,0,1,1,0,0,1,1,0,0,0,1,0,1,0,1,0,0,0,0,1,1,1,1,1,1,
- 1,0,1,1,0,1,1,1,0,0,1,1,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,1,1,0,
- 1};
-
-const unsigned int gen8[] =
-{1,1,0,1,0,1,0,0,0,1,1,0,0,1,1,0,1,0,0,1,1,1,1,1,0,0,1,0,0,0,0,0,
- 1,0,1,0,1,1,1,0,1,0,1,1,0,1,1,0,0,0,1,1,1,1,1,1,1,0,0,1,1,0,0,0,
- 1,0,1,1,1,1,0,1,1,1,1,0,1,0,0,1,1,1,1,0,0,1,0,0,1,0,0,0,1,1,1,0,
- 1,1,1,1,1,0,1,0,1,0,1,0,0,1,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,
- 1};
+int codeword[MAXN];
 
 /*************************************************************************/
 /*******************        MAIN FUNCTION       **************************/
@@ -71,7 +22,10 @@ const unsigned int gen8[] =
 
 int main()
 {
-	FILE *o1, *o2;
+
+	int message[MAXN];//, message[MAXN]; // information bits
+	int err[MAXT+DRIFT];          // array of random error location
+	FILE *o1, *o2, *o3;
 	int *pow, *index;
 	int n,k,i,s;
 	unsigned long int seed;
@@ -108,9 +62,9 @@ int main()
 	for(s = 0; s <100; s++)
 	{
 
-	message_gen(n,k,&seed);
+	message_gen(n,k,&seed,message);
 #ifdef SERIAL
-	BCH_s_enc(n,k);
+	BCH_s_enc(n,k, message);
 #endif
 
 
@@ -138,13 +92,13 @@ int main()
 	}
 	// Sort of the error locations in decreasing order:
 	// it will be useful to check the corrispondence with errors detected
-	elSort(t(n,k)+DRIFT);
+	elSort(t(n,k)+DRIFT, err);
 #endif
 
 	if(error_detection(pow,index,t(n,k)+DRIFT) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
 		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
-		BerlMass((t(n,k)+DRIFT)*2,pow,index);
+		BerlMass((t(n,k)+DRIFT)*2,pow,index, err, o3);
 
 	}
 	else

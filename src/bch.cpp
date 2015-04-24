@@ -10,11 +10,6 @@
 
 #include "bch.h"
 
-#define MAXR 192 // max r bits
-#define P 8      // degree of parallelism
-#define MAXN ((1<<16)-1)  // primitive code length
-#define MAXT 12         // Max corrective capacity
-#define DRIFT 0 // adding extra errors
 
 
 #ifndef TESTENC
@@ -28,15 +23,12 @@
 /*********************** Global Variable  **********************************/
 /***************************************************************************/
 
-extern int codeword[MAXN],
-	message[MAXN]; // information bits
+extern int codeword[MAXN]; // information bits
 
 int Ap_n[MAXR][MAXR];	// (n-k) rows, (n-k) col
 int Ap_k[MAXR][MAXR];	// 192 rows, 192 col
 int C[MAXR][P];			// 192 rows, 8 col
 int S[(MAXT + DRIFT)*2];          // Syndrome vector
-extern int err[MAXT+DRIFT];          // array of random error location
-extern FILE *o3;
 
 /****************************************************************************/
 /*********************** PN bit source **************************************/
@@ -59,7 +51,7 @@ int lfsr(unsigned long int *seed)
 /*********************** Message generator **********************************/
 /***************************************************************************/
 
-void message_gen(int n,int k, unsigned long int  *seed)
+void message_gen(int n,int k, unsigned long int  *seed, int* message)
 {
 	int i;
     // Message bits pseudo random generation
@@ -104,7 +96,7 @@ const unsigned int gen8[] =
 /*********************** Serial BCH encoder ********************************/
 /***************************************************************************/
 
-void BCH_s_enc(int n, int k)
+void BCH_s_enc(int n, int k, int* message)
 {
 
 	const unsigned int *g;
@@ -304,7 +296,7 @@ int comb_k(int index, int *reg_old)
 /*********************** n clock ticks        *******************************/
 /***************************************************************************/
 
-void BCHnclk_par(int n,int k)
+void BCHnclk_par(int n,int k, int* message, int* codeword)
 {
 	int clock_ticks;
 	int *reg, *reg_old;
@@ -388,7 +380,7 @@ void BCHnclk_par(int n,int k)
 /*********************** k clock ticks        *******************************/
 /***************************************************************************/
 
-void BCHkclk_par(int n,int k)
+void BCHkclk_par(int n,int k, int* message, int* codeword)
 {
 	int clock_ticks;
 	int *reg, *reg_old;
@@ -540,7 +532,9 @@ bool error_detection(int *pow, int *index, int t)
 void BerlMass(//int *S, // array of syndrome in exponential notation
 			  int t2, // length of array S
 			  int *pow,
-			  int *index)
+			  int *index,
+			  int *err,
+			  FILE *o3)
 
 {
 	int k,L,l,i;
@@ -664,7 +658,7 @@ double uniform01(long *pSeed )
 /*********************** Insertion sort  *******************************/
 /***************************************************************************/
 
-void elSort(int dim)
+void elSort(int dim, int* err)
 {
 	int i, j;
 	int key;
