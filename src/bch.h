@@ -62,6 +62,12 @@ double uniform01(long *pSeed );
 void elSort(int dim, int* err);
 
 /*********************** print msg and code  *******************************/
-void print(int n,int k, int* message, int* codeword, int length);
+void printNK(int n,int k, int* message, int* codeword, int length);
+
+/*********************** verify result  *******************************/
+bool verifyResult(int n, int k, int* message, int* messageRef);
+
+/*********************** final step of BCH decoder ********************************/
+void BCH_final_dec(int n, int k, int* message, int* codeword);
 
 #endif

@@ -670,7 +670,7 @@ void elSort(int dim, int* err)
 }
 
 /*********************** print msg and code  *******************************/
-void print( int n,int k, int* message, int* codeword, int length )
+void printNK( int n,int k, int* message, int* codeword, int length )
 {
 	std::cout << std::endl << "msg:" << std::endl;
 	int nMax = n-k+length-1;
@@ -682,4 +682,23 @@ void print( int n,int k, int* message, int* codeword, int length )
 		std::cout << codeword[i] << " ";
 
 	std::cout << std::endl;
+}
+
+void BCH_final_dec( int n, int k, int* message, int* codeword )
+{
+	for (int i=n-1;i>=n-k;i--)
+		message[i] = codeword[i];
+}
+
+bool verifyResult( int n, int k, int* message, int* messageRef )
+{
+	bool bSuccess = true;
+	for (int i=n-1;i>=n-k;i--)	{
+		if( message[i] != messageRef[i])	{
+			bSuccess = false;
+			break;
+		}
+	}
+
+	return bSuccess;
 }
