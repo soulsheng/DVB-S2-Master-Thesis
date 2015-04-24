@@ -372,6 +372,7 @@ void BCHnclk_par(int n,int k, int* message, int* codeword)
 	for (i=n-k-1; i>=0; i--)
 		codeword[i] =  reg[i];
 
+	free(reg);	free(reg_old);
 }
 
 /****************************************************************************/
@@ -456,6 +457,7 @@ void BCHkclk_par(int n,int k, int* message, int* codeword)
 		fprintf(de,"%d\n",reg[i]);
 	*/
 
+	free(reg);	free(reg_old);
 }
 
 /****************************************************************************/
@@ -641,6 +643,7 @@ void BerlMass(//int *S, // array of syndrome in exponential notation
 	fprintf(o3,"\n\n-------------------------------------");
 
 
+	free(T); free(c); free(p); free(lambda); free(el);
 
 }
 

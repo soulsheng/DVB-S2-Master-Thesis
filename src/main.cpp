@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <math.h>
-
+#include <stdlib.h>
 #include <bch.h>
 
 #ifndef TESTENC
@@ -104,6 +104,8 @@ int main()
 	else
 		fprintf(stdout,"\n\nNo errors detected!\n------------------------------\n");
 	}
+
+	//free(pow);	free(index);
 
 	return 0;
 }
