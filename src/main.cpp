@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <conio.h>
-#include <iostream.h>
+#include <iostream>
 #include <time.h>
 #include <dos.h>
 #include <stdio.h>
 #include <string.h>
-#include <fstream.h>
+#include <fstream>
 #include <math.h>
 
 
