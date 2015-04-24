@@ -42,10 +42,6 @@ int main()
 	n = 16200; k=16008; // n = 21600; k = 21408; // n = 43200; k = 43040;
 
 	int tVal = t(n,k) + DRIFT;
-	int *el = (int*) calloc(tVal*2,sizeof(int));
-
-	BCH_BM	bch(tVal, 16);
-	bch.initialize();
 
 #ifndef SERIAL
 	load_matrices(n,k);
@@ -55,6 +51,9 @@ int main()
 	o3 = fopen(outfile,"w");
 #endif
 	
+
+	BCH_BM	bch(tVal, 16, o3);
+	bch.initialize();
 
 #if defined (TESTDEC)
 	sprintf(outfile,"DecTest/outdec_%d_%d.txt",n,k);
@@ -104,32 +103,7 @@ int main()
 	std::cout << "add error to code: " << std::endl;
 	bch.printNK( n,k, message, codeword, 100 );
 
-	if(bch.error_detection(codeword) ) {
-		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
-		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
-		bch.BerlMass(el);
-
-		bool success = true;
-		fprintf(o3,"\nPosition of errors detected:\n");
-		for(i = 0; i <tVal*2; i++) {
-			if(el[i] != err[i]) {success=false;}
-			fprintf(o3,"%d\t",el[i]);
-
-			codeword[ el[i] ] ^= 1;
-		}
-		if(success) {fprintf(o3,"\nSuccessful decoding!");
-		fprintf(stdout,"\nSuccessful decoding!\n----------------------\n");};
-		fprintf(o3,"\n\n-------------------------------------");
-
-		std::cout << "correct error for code: " << std::endl;
-		bch.printNK( n,k, message, codeword, 100 );
-
-	}
-	else
-		fprintf(stdout,"\n\nNo errors detected!\n------------------------------\n");
-
-
-	bch.BCH_final_dec(n,k, messageRecv, codeword);
+	bch.decode(n,k, messageRecv, codeword);
 
 	bool	bRight = bch.verifyResult(n,k, message, messageRecv);
 	if ( bRight )

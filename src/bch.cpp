@@ -526,8 +526,7 @@ bool BCH_BM::error_detection(int* codeword)
 /*********************** Error correction   *******************************/
 /***************************************************************************/
 
-void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
-			  int *el)
+void BCH_BM::BerlMass()
 
 {
 	int t2 = 2*t;
@@ -697,10 +696,11 @@ bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
 	return bSuccess;
 }
 
-BCH_BM::BCH_BM(int t, int m)
+BCH_BM::BCH_BM(int t, int m, FILE *o3)
 {
 	this->t = t;
 	this->m = m;
+	this->o3 = o3;
 }
 
 BCH_BM::~BCH_BM()
@@ -717,10 +717,38 @@ void BCH_BM::initialize()
 
 	// Galois Field Creation
 	gfField(m, 32+8+4+1);
+
+	el = (int*) calloc(t*2,sizeof(int));
 }
 
 void BCH_BM::release()
 {
 	//free(powAlpha);	free(indexAlpha);
+	free( el );
+
+}
+
+void BCH_BM::decode( int n, int k, int* messageRecv, int* codeword )
+{
+	if( error_detection(codeword) ) {
+		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
+		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
+		BerlMass();
+
+		bool success = true;
+		fprintf(o3,"\nPosition of errors detected:\n");
+		for(int i = 0; i <t*2; i++) 
+			codeword[ el[i] ] ^= 1;
+
+		if(success) {fprintf(o3,"\nSuccessful decoding!");
+		fprintf(stdout,"\nSuccessful decoding!\n----------------------\n");};
+		fprintf(o3,"\n\n-------------------------------------");
+
+	}
+	else
+		fprintf(stdout,"\n\nNo errors detected!\n------------------------------\n");
+
+
+	BCH_final_dec(n,k, messageRecv, codeword);
 
 }

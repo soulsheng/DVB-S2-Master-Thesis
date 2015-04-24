@@ -18,7 +18,7 @@ class BCH_BM
 {
 public:
 	// @param m	Base 2 logarithm of cardinality of the Field
-	BCH_BM(int t2, int m); 
+	BCH_BM(int t2, int m, FILE *o3); 
 	~BCH_BM();
 	void initialize();
 	void release();
@@ -54,8 +54,7 @@ void gfField(int m, // Base 2 logarithm of cardinality of the Field
 bool error_detection(int* codeword);
 
 /*********************** Error correction   *******************************/
-void BerlMass(//int *S, // array of syndrome in exponential notation
-	int *el);
+void BerlMass();
 
 // Random variable uniformly distributed between 0.0 and 1.0
 double uniform01(long *pSeed );
@@ -78,6 +77,7 @@ void message_gen(int n,int k, unsigned long int  *seed, int* message);
 /*********************** Serial BCH encoder ********************************/
 void BCH_s_enc(int n, int k, int* message, int* codeword);
 
+void decode(int n, int k, int* message, int* codeword);
 
 private:
 	int *powAlpha, *indexAlpha;
@@ -85,6 +85,9 @@ private:
 	int t;
 
 	int n,k;
+	int *el;
+
+	FILE* o3;
 };
 
 #endif
