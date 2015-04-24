@@ -17,7 +17,8 @@
 class BCH_BM
 {
 public:
-	BCH_BM();
+	// @param m	Base 2 logarithm of cardinality of the Field
+	BCH_BM(int t2, int m); 
 	~BCH_BM();
 	void initialize();
 	void release();
@@ -46,17 +47,14 @@ public:
 
 /*********************** Creation of GF(2^m)  *******************************/
 void gfField(int m, // Base 2 logarithm of cardinality of the Field
-	int poly, // primitive polynomial of the Field in decimal form
-	int ** powOfAlpha, int ** indexAlpha);
+	int poly// primitive polynomial of the Field in decimal form
+	);
 
 /*********************** Error detection   *******************************/
-bool error_detection(int *pow, int *index, int t, int* codeword);
+bool error_detection(int* codeword);
 
 /*********************** Error correction   *******************************/
 void BerlMass(//int *S, // array of syndrome in exponential notation
-	int t2, // length of array S
-	int *pow,
-	int *index,
 	int *el);
 
 // Random variable uniformly distributed between 0.0 and 1.0
@@ -82,7 +80,11 @@ void BCH_s_enc(int n, int k, int* message, int* codeword);
 
 
 private:
+	int *powAlpha, *indexAlpha;
+	int m;
+	int t;
 
+	int n,k;
 };
 
 #endif

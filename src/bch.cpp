@@ -466,8 +466,8 @@ void BCH_BM::BCHkclk_par(int n,int k, int* message, int* codeword)
 /***************************************************************************/
 
 void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
-			 int poly, // primitive polynomial of the Field in decimal form
-			 int ** powOfAlpha, int ** indexAlpha)
+			 int poly // primitive polynomial of the Field in decimal form
+			 )
 {
 	int reg,	// this integer of 32 bits, masked by a sequence of m ones,
 				// contains the elements of Galois Field
@@ -475,13 +475,9 @@ void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
 	// sequence of m ones
 	int mask = (1<<m) -1;  // 1(m) Bit Masking
 
-	// Allocation and initialization of the tables of the Galois Field
-	*powOfAlpha = (int *)calloc((1<<m)-2, sizeof(int));
-	*indexAlpha = (int *)calloc((1<<m)-1, sizeof(int));
-
-	(*powOfAlpha)[0] = 1;
-	(*indexAlpha)[0] = - 1; // we set -1
-	(*indexAlpha)[1] = 0;
+	powAlpha[0] = 1;
+	indexAlpha[0] = - 1; // we set -1
+	indexAlpha[1] = 0;
 
 	for (i = 0, reg = 1; i < (1<<m)-2; i++)
 	{
@@ -493,8 +489,8 @@ void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
 				reg &= mask;
 			}
 			// Step-by-step writing of the tables
-			(*powOfAlpha)[i+1] = (int) reg;
-			(*indexAlpha)[(int)reg] = i+1;
+			powAlpha[i+1] = (int) reg;
+			indexAlpha[(int)reg] = i+1;
     }
 
 
@@ -505,7 +501,7 @@ void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
 /*********************** Error detection   *******************************/
 /***************************************************************************/
 
-bool BCH_BM::error_detection(int *pow, int *index, int t, int* codeword)
+bool BCH_BM::error_detection(int* codeword)
 {
 
 	bool syn = false;
@@ -514,9 +510,9 @@ bool BCH_BM::error_detection(int *pow, int *index, int t, int* codeword)
 		S[i] = 0;
 		for(int j = 0; j < MAXN; j++){
 			if(codeword[j])
-				S[i] ^= pow[((i+1)*j)%MAXN];
+				S[i] ^= powAlpha[((i+1)*j)%MAXN];
 		}
-		if((S[i] = index[S[i]]) != -1)
+		if((S[i] = indexAlpha[S[i]]) != -1)
 			syn = true;
 
 	}
@@ -531,12 +527,10 @@ bool BCH_BM::error_detection(int *pow, int *index, int t, int* codeword)
 /***************************************************************************/
 
 void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
-			  int t2, // length of array S
-			  int *pow,
-			  int *index,
 			  int *el)
 
 {
+	int t2 = 2*t;
 	int k,L,l,i;
 	int d, dm, tmp;
 	int *T, *c, *p, *lambda;
@@ -567,10 +561,10 @@ void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
 		if(S[k] == -1)
 			d = 0;
 		else
-			d = pow[S[k]];
+			d = powAlpha[S[k]];
 		for(i = 1; i <= L;i++)
 			if(S[k-i] >= 0 && c[i] > 0)
-			d ^= pow[(index[c[i]]+ S[k-i])%MAXN];
+			d ^= powAlpha[(indexAlpha[c[i]]+ S[k-i])%MAXN];
 			// exponential rule
 
 		if( d == 0)
@@ -584,7 +578,7 @@ void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
 				for( i = l; i <t2; i++)
 				{
 					if(p[i-l] != 0)
-						c[i] ^= pow[(index[d]-index[dm]+index[p[i-l]]+MAXN)%MAXN];
+						c[i] ^= powAlpha[(indexAlpha[d]-indexAlpha[dm]+indexAlpha[p[i-l]]+MAXN)%MAXN];
 				}
 				l++;
 			}
@@ -595,7 +589,7 @@ void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
 				for( i = l; i <t2; i++)
 				{
 					if(p[i-l] != 0)
-						c[i] ^= pow[(index[d]-index[dm]+index[p[i-l]]+MAXN)%MAXN];
+						c[i] ^= powAlpha[(indexAlpha[d]-indexAlpha[dm]+indexAlpha[p[i-l]]+MAXN)%MAXN];
 				}
 				L = k-L+1;
 				for( i = 0; i < t2; i++)
@@ -613,7 +607,7 @@ void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
 	for(i = 0; i <=L; i++)
 	{
 		// Error storing
-		lambda[i] = index[c[i]];
+		lambda[i] = indexAlpha[c[i]];
 
 	}
 
@@ -625,7 +619,7 @@ void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
 	for(i = 0; i < MAXN; i++)
 	{
 		for(j = 1, tmp = 0; j <=L; j++)
-			tmp ^= pow[(lambda[j]+i*j)%MAXN];
+			tmp ^= powAlpha[(lambda[j]+i*j)%MAXN];
 		if (tmp == 1)
 			// roots inversion give the error locations
 			el[k++] = (MAXN-i)%MAXN;
@@ -703,12 +697,30 @@ bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
 	return bSuccess;
 }
 
-BCH_BM::BCH_BM()
+BCH_BM::BCH_BM(int t, int m)
 {
-
+	this->t = t;
+	this->m = m;
 }
 
 BCH_BM::~BCH_BM()
 {
+	release();
+}
+
+void BCH_BM::initialize()
+{
+
+	// Allocation and initialization of the tables of the Galois Field
+	powAlpha = (int *)calloc((1<<m)-2, sizeof(int));
+	indexAlpha = (int *)calloc((1<<m)-1, sizeof(int));
+
+	// Galois Field Creation
+	gfField(m, 32+8+4+1);
+}
+
+void BCH_BM::release()
+{
+	//free(powAlpha);	free(indexAlpha);
 
 }

@@ -23,14 +23,12 @@
 
 int main()
 {
-	BCH_BM	bch;
 
 	int message[MAXN];				// information bits
 	int codeword[MAXN]={0};			// codeword bits
 	int messageRecv[MAXN]={0};		// information received
 	int err[MAXT+DRIFT];          // array of random error location
 	FILE *o1, *o2, *o3;
-	int *pow, *index;
 	int n,k,i,s;
 	unsigned long int seed;
 	long seed2;
@@ -46,6 +44,9 @@ int main()
 	int tVal = t(n,k) + DRIFT;
 	int *el = (int*) calloc(tVal*2,sizeof(int));
 
+	BCH_BM	bch(tVal, 16);
+	bch.initialize();
+
 #ifndef SERIAL
 	load_matrices(n,k);
 #endif
@@ -53,12 +54,7 @@ int main()
 	sprintf(outfile,"DecTest/outdec_%d_%d.txt",n,k);
 	o3 = fopen(outfile,"w");
 #endif
-	// Galois Field Creation
-	bch.gfField(16,
-		32+8+4+1,
-		&pow,
-		&index
-		);
+	
 
 #if defined (TESTDEC)
 	sprintf(outfile,"DecTest/outdec_%d_%d.txt",n,k);
@@ -108,10 +104,10 @@ int main()
 	std::cout << "add error to code: " << std::endl;
 	bch.printNK( n,k, message, codeword, 100 );
 
-	if(bch.error_detection(pow,index,tVal, codeword) ) {
+	if(bch.error_detection(codeword) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
 		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
-		bch.BerlMass(tVal*2,pow,index, el);
+		bch.BerlMass(el);
 
 		bool success = true;
 		fprintf(o3,"\nPosition of errors detected:\n");
@@ -143,7 +139,6 @@ int main()
 
 	}
 
-	//free(pow);	free(index);
 
 	return 0;
 }
