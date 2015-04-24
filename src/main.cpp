@@ -661,7 +661,11 @@ void BerlMass(//int *S, // array of syndrome in exponential notation
 
 
 // Random variable uniformly distributed between 0.0 and 1.0
-extern double uniform01(long * );
+double uniform01(long *pSeed )
+{
+	srand( *pSeed ) ;
+	return (double)rand()/(double)RAND_MAX;
+}
 
 /****************************************************************************/
 /*********************** Insertion sort  *******************************/
