@@ -363,6 +363,7 @@ void BCHnclk_par(int n,int k)
 		if (clock_ticks >0)
 		{
 
+			int m;
 			for (m=0; m<n-k; m++)
 			{
 				if (m<P)
@@ -380,7 +381,7 @@ void BCHnclk_par(int n,int k)
 /************************************************************************************/
 
 /*********************** Codeword in systematic form ********************************/
-
+	int i;
 	for (i=n-1; i>n-k-1; i--)
 		codeword[i] = message[i];
 
@@ -457,7 +458,7 @@ void BCHkclk_par(int n,int k)
 		}
 	}
 /*********************** Codeword in systematic form ********************************/
-
+	int i;
 	for (i=n-1; i>n-k-1; i--)
 		codeword[i] = message[i];
 
