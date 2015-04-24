@@ -22,7 +22,7 @@ int lfsr(unsigned long int *seed);
 void message_gen(int n,int k, unsigned long int  *seed, int* message);
 
 /*********************** Serial BCH encoder ********************************/
-void BCH_s_enc(int n, int k, int* message);
+void BCH_s_enc(int n, int k, int* message, int* codeword);
 
 /*********************** Loading matrices routine ***************************/
 void load_matrices(int n, int k);
@@ -46,7 +46,7 @@ void gfField(int m, // Base 2 logarithm of cardinality of the Field
 	int ** powOfAlpha, int ** indexAlpha);
 
 /*********************** Error detection   *******************************/
-bool error_detection(int *pow, int *index, int t);
+bool error_detection(int *pow, int *index, int t, int* codeword);
 
 /*********************** Error correction   *******************************/
 void BerlMass(//int *S, // array of syndrome in exponential notation

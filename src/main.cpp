@@ -14,7 +14,6 @@
 /****************************************************************************/
 /*********************** Global Variable  **********************************/
 /***************************************************************************/
-int codeword[MAXN];
 
 /*************************************************************************/
 /*******************        MAIN FUNCTION       **************************/
@@ -24,6 +23,7 @@ int main()
 {
 
 	int message[MAXN];//, message[MAXN]; // information bits
+	int codeword[MAXN]={0};
 	int err[MAXT+DRIFT];          // array of random error location
 	FILE *o1, *o2, *o3;
 	int *pow, *index;
@@ -64,7 +64,7 @@ int main()
 
 	message_gen(n,k,&seed,message);
 #ifdef SERIAL
-	BCH_s_enc(n,k, message);
+	BCH_s_enc(n,k, message, codeword);
 #endif
 
 
@@ -95,7 +95,7 @@ int main()
 	elSort(t(n,k)+DRIFT, err);
 #endif
 
-	if(error_detection(pow,index,t(n,k)+DRIFT) ) {
+	if(error_detection(pow,index,t(n,k)+DRIFT, codeword) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
 		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
 		BerlMass((t(n,k)+DRIFT)*2,pow,index, err, o3);

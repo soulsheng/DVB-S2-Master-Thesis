@@ -23,7 +23,6 @@
 /*********************** Global Variable  **********************************/
 /***************************************************************************/
 
-extern int codeword[MAXN]; // information bits
 
 int Ap_n[MAXR][MAXR];	// (n-k) rows, (n-k) col
 int Ap_k[MAXR][MAXR];	// 192 rows, 192 col
@@ -96,7 +95,7 @@ const unsigned int gen8[] =
 /*********************** Serial BCH encoder ********************************/
 /***************************************************************************/
 
-void BCH_s_enc(int n, int k, int* message)
+void BCH_s_enc(int n, int k, int* message, int* codeword)
 {
 
 	const unsigned int *g;
@@ -504,7 +503,7 @@ void gfField(int m, // Base 2 logarithm of cardinality of the Field
 /*********************** Error detection   *******************************/
 /***************************************************************************/
 
-bool error_detection(int *pow, int *index, int t)
+bool error_detection(int *pow, int *index, int t, int* codeword)
 {
 
 	bool syn = false;
