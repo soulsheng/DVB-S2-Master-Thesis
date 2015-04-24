@@ -14,15 +14,17 @@
 #define MAXT 12         // Max corrective capacity
 #define DRIFT 0 // adding extra errors
 
+class BCH_BM
+{
+public:
+	BCH_BM();
+	~BCH_BM();
+	void initialize();
+	void release();
 
+protected:
 /*********************** PN bit source **************************************/
 int lfsr(unsigned long int *seed);
-
-/*********************** Message generator **********************************/
-void message_gen(int n,int k, unsigned long int  *seed, int* message);
-
-/*********************** Serial BCH encoder ********************************/
-void BCH_s_enc(int n, int k, int* message, int* codeword);
 
 /*********************** Loading matrices routine ***************************/
 void load_matrices(int n, int k);
@@ -39,6 +41,8 @@ void BCHnclk_par(int n,int k, int* message, int* codeword);
 
 /*********************** BCH parellel encoder k clock ticks *****************/
 void BCHkclk_par(int n,int k, int* message, int* codeword);
+
+public:
 
 /*********************** Creation of GF(2^m)  *******************************/
 void gfField(int m, // Base 2 logarithm of cardinality of the Field
@@ -69,5 +73,16 @@ bool verifyResult(int n, int k, int* message, int* messageRef);
 
 /*********************** final step of BCH decoder ********************************/
 void BCH_final_dec(int n, int k, int* message, int* codeword);
+
+/*********************** Message generator **********************************/
+void message_gen(int n,int k, unsigned long int  *seed, int* message);
+
+/*********************** Serial BCH encoder ********************************/
+void BCH_s_enc(int n, int k, int* message, int* codeword);
+
+
+private:
+
+};
 
 #endif

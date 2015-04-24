@@ -33,7 +33,7 @@ int S[(MAXT + DRIFT)*2];          // Syndrome vector
 /*********************** PN bit source **************************************/
 /***************************************************************************/
 
-int lfsr(unsigned long int *seed)
+int BCH_BM::lfsr(unsigned long int *seed)
 {
 	int b,c;
 
@@ -50,7 +50,7 @@ int lfsr(unsigned long int *seed)
 /*********************** Message generator **********************************/
 /***************************************************************************/
 
-void message_gen(int n,int k, unsigned long int  *seed, int* message)
+void BCH_BM::message_gen(int n,int k, unsigned long int  *seed, int* message)
 {
 	int i;
     // Message bits pseudo random generation
@@ -95,7 +95,7 @@ const unsigned int gen8[] =
 /*********************** Serial BCH encoder ********************************/
 /***************************************************************************/
 
-void BCH_s_enc(int n, int k, int* message, int* codeword)
+void BCH_BM::BCH_s_enc(int n, int k, int* message, int* codeword)
 {
 
 	const unsigned int *g;
@@ -155,7 +155,7 @@ void BCH_s_enc(int n, int k, int* message, int* codeword)
 /*********************** Loading matrices routine ***************************/
 /***************************************************************************/
 
-void load_matrices(int n, int k)
+void BCH_BM::load_matrices(int n, int k)
 {
 	FILE *input_Ap_k, *input_C, *input_Ap_n;
 	int i,j;
@@ -237,7 +237,7 @@ void load_matrices(int n, int k)
 /******************  Input comb network  ********************************/
 /***********************************************************************/
 
-int comb_c(int index, int *input)
+int BCH_BM::comb_c(int index, int *input)
 {
 	int out,f,ind;
 
@@ -258,7 +258,7 @@ int comb_c(int index, int *input)
 /******************  State comb network  ********************************/
 /***********************************************************************/
 
-int comb_n(int index,int r, int *reg_old)
+int BCH_BM::comb_n(int index,int r, int *reg_old)
 {
 	int out,f;
 
@@ -273,7 +273,7 @@ int comb_n(int index,int r, int *reg_old)
 	return(out);
 }
 
-int comb_k(int index, int *reg_old)
+int BCH_BM::comb_k(int index, int *reg_old)
 {
 	int out,f;
 
@@ -295,7 +295,7 @@ int comb_k(int index, int *reg_old)
 /*********************** n clock ticks        *******************************/
 /***************************************************************************/
 
-void BCHnclk_par(int n,int k, int* message, int* codeword)
+void BCH_BM::BCHnclk_par(int n,int k, int* message, int* codeword)
 {
 	int clock_ticks;
 	int *reg, *reg_old;
@@ -380,7 +380,7 @@ void BCHnclk_par(int n,int k, int* message, int* codeword)
 /*********************** k clock ticks        *******************************/
 /***************************************************************************/
 
-void BCHkclk_par(int n,int k, int* message, int* codeword)
+void BCH_BM::BCHkclk_par(int n,int k, int* message, int* codeword)
 {
 	int clock_ticks;
 	int *reg, *reg_old;
@@ -465,7 +465,7 @@ void BCHkclk_par(int n,int k, int* message, int* codeword)
 /*********************** useful tables        *******************************/
 /***************************************************************************/
 
-void gfField(int m, // Base 2 logarithm of cardinality of the Field
+void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
 			 int poly, // primitive polynomial of the Field in decimal form
 			 int ** powOfAlpha, int ** indexAlpha)
 {
@@ -505,7 +505,7 @@ void gfField(int m, // Base 2 logarithm of cardinality of the Field
 /*********************** Error detection   *******************************/
 /***************************************************************************/
 
-bool error_detection(int *pow, int *index, int t, int* codeword)
+bool BCH_BM::error_detection(int *pow, int *index, int t, int* codeword)
 {
 
 	bool syn = false;
@@ -530,7 +530,7 @@ bool error_detection(int *pow, int *index, int t, int* codeword)
 /*********************** Error correction   *******************************/
 /***************************************************************************/
 
-void BerlMass(//int *S, // array of syndrome in exponential notation
+void BCH_BM::BerlMass(//int *S, // array of syndrome in exponential notation
 			  int t2, // length of array S
 			  int *pow,
 			  int *index,
@@ -641,7 +641,7 @@ void BerlMass(//int *S, // array of syndrome in exponential notation
 
 
 // Random variable uniformly distributed between 0.0 and 1.0
-double uniform01(long *pSeed )
+double BCH_BM::uniform01(long *pSeed )
 {
 	srand( *pSeed ) ;
 	return (double)rand()/(double)RAND_MAX;
@@ -651,7 +651,7 @@ double uniform01(long *pSeed )
 /*********************** Insertion sort  *******************************/
 /***************************************************************************/
 
-void elSort(int dim, int* err)
+void BCH_BM::elSort(int dim, int* err)
 {
 	int i, j;
 	int key;
@@ -670,7 +670,7 @@ void elSort(int dim, int* err)
 }
 
 /*********************** print msg and code  *******************************/
-void printNK( int n,int k, int* message, int* codeword, int length )
+void BCH_BM::printNK( int n,int k, int* message, int* codeword, int length )
 {
 	std::cout << std::endl << "msg:" << std::endl;
 	int nMax = n-k+length-1;
@@ -684,13 +684,13 @@ void printNK( int n,int k, int* message, int* codeword, int length )
 	std::cout << std::endl;
 }
 
-void BCH_final_dec( int n, int k, int* message, int* codeword )
+void BCH_BM::BCH_final_dec( int n, int k, int* message, int* codeword )
 {
 	for (int i=n-1;i>=n-k;i--)
 		message[i] = codeword[i];
 }
 
-bool verifyResult( int n, int k, int* message, int* messageRef )
+bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
 {
 	bool bSuccess = true;
 	for (int i=n-1;i>=n-k;i--)	{
@@ -701,4 +701,14 @@ bool verifyResult( int n, int k, int* message, int* messageRef )
 	}
 
 	return bSuccess;
+}
+
+BCH_BM::BCH_BM()
+{
+
+}
+
+BCH_BM::~BCH_BM()
+{
+
 }

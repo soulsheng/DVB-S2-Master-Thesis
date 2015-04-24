@@ -23,6 +23,7 @@
 
 int main()
 {
+	BCH_BM	bch;
 
 	int message[MAXN];				// information bits
 	int codeword[MAXN]={0};			// codeword bits
@@ -53,7 +54,7 @@ int main()
 	o3 = fopen(outfile,"w");
 #endif
 	// Galois Field Creation
-	gfField(16,
+	bch.gfField(16,
 		32+8+4+1,
 		&pow,
 		&index
@@ -68,13 +69,13 @@ int main()
 	for(s = 0; s <2; s++)
 	{
 
-	message_gen(n,k,&seed,message);
+	bch.message_gen(n,k,&seed,message);
 #ifdef SERIAL
-	BCH_s_enc(n,k, message, codeword);
+	bch.BCH_s_enc(n,k, message, codeword);
 #endif
 
 	std::cout << "init msg & code: " << std::endl;
-	printNK( n,k, message, codeword, 100 );
+	bch.printNK( n,k, message, codeword, 100 );
 
 #ifdef NPARALLEL
 	BCHnclk_par(n,k);
@@ -101,16 +102,16 @@ int main()
 	}
 	// Sort of the error locations in decreasing order:
 	// it will be useful to check the corrispondence with errors detected
-	elSort(tVal, err);
+	bch.elSort(tVal, err);
 #endif
 
 	std::cout << "add error to code: " << std::endl;
-	printNK( n,k, message, codeword, 100 );
+	bch.printNK( n,k, message, codeword, 100 );
 
-	if(error_detection(pow,index,tVal, codeword) ) {
+	if(bch.error_detection(pow,index,tVal, codeword) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
 		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
-		BerlMass(tVal*2,pow,index, el);
+		bch.BerlMass(tVal*2,pow,index, el);
 
 		bool success = true;
 		fprintf(o3,"\nPosition of errors detected:\n");
@@ -125,16 +126,16 @@ int main()
 		fprintf(o3,"\n\n-------------------------------------");
 
 		std::cout << "correct error for code: " << std::endl;
-		printNK( n,k, message, codeword, 100 );
+		bch.printNK( n,k, message, codeword, 100 );
 
 	}
 	else
 		fprintf(stdout,"\n\nNo errors detected!\n------------------------------\n");
 
 
-	BCH_final_dec(n,k, messageRecv, codeword);
+	bch.BCH_final_dec(n,k, messageRecv, codeword);
 
-	bool	bRight = verifyResult(n,k, message, messageRecv);
+	bool	bRight = bch.verifyResult(n,k, message, messageRecv);
 	if ( bRight )
 		std::cout << s+1 << "# message recovered!" << std::endl << std::endl;
 	else
