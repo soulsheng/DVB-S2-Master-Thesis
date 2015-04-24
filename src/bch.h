@@ -53,13 +53,15 @@ void BerlMass(//int *S, // array of syndrome in exponential notation
 	int t2, // length of array S
 	int *pow,
 	int *index,
-	int *err,
-	FILE *o3);
+	int *el);
 
 // Random variable uniformly distributed between 0.0 and 1.0
 double uniform01(long *pSeed );
 
 /*********************** Insertion sort  *******************************/
 void elSort(int dim, int* err);
+
+/*********************** print msg and code  *******************************/
+void print(int n,int k, int* message, int* codeword, int length);
 
 #endif

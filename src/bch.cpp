@@ -534,13 +534,12 @@ void BerlMass(//int *S, // array of syndrome in exponential notation
 			  int t2, // length of array S
 			  int *pow,
 			  int *index,
-			  int *err,
-			  FILE *o3)
+			  int *el)
 
 {
 	int k,L,l,i;
 	int d, dm, tmp;
-	int *T, *c, *p, *lambda,*el;
+	int *T, *c, *p, *lambda;
 	// Allocation and initialization
 	// Auto-Regressive-Filter coefficients computed at the previous step
 	p = (int*) calloc(t2,sizeof(int));
@@ -549,7 +548,7 @@ void BerlMass(//int *S, // array of syndrome in exponential notation
 	// Temporary array
 	T = (int*) calloc(t2,sizeof(int));
 	// error location array (found by Chien Search)
-	el = (int*) calloc(t2,sizeof(int));
+	//el = (int*) calloc(t2,sizeof(int));
 	// Error polynomial locator
 	lambda = (int*) calloc(t2,sizeof(int));
 
@@ -632,18 +631,10 @@ void BerlMass(//int *S, // array of syndrome in exponential notation
 			el[k++] = (MAXN-i)%MAXN;
 
 	}
-	bool success = true;
-	fprintf(o3,"\nPosition of errors detected:\n");
-	for(i = 0; i <k; i++) {
-		if(el[i] != err[i]) {success=false;}
-		fprintf(o3,"%d\t",el[i]);
-	}
-	if(success) {fprintf(o3,"\nSuccessful decoding!");
-	fprintf(stdout,"\nSuccessful decoding!\n----------------------\n");};
-	fprintf(o3,"\n\n-------------------------------------");
+	
 
 
-	free(T); free(c); free(p); free(lambda); free(el);
+	free(T); free(c); free(p); free(lambda); //free(el);
 
 }
 
@@ -676,4 +667,19 @@ void elSort(int dim, int* err)
 		err[j+1] = key;
 	}
 
+}
+
+/*********************** print msg and code  *******************************/
+void print( int n,int k, int* message, int* codeword, int length )
+{
+	std::cout << std::endl << "msg:" << std::endl;
+	int nMax = n-k+length-1;
+	for (int i=nMax;i>=n-k;i--)
+		std::cout << message[i] << " ";
+
+	std::cout << std::endl << "code:" << std::endl;
+	for (int i=nMax;i>=n-k;i--)
+		std::cout << codeword[i] << " ";
+
+	std::cout << std::endl;
 }

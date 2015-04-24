@@ -39,6 +39,9 @@ int main()
 	n = 57600;  k = 57472;  //
 	n = 16200; k=16008; // n = 21600; k = 21408; // n = 43200; k = 43040;
 
+	int tVal = t(n,k) + DRIFT;
+	int *el = (int*) calloc(tVal*2,sizeof(int));
+
 #ifndef SERIAL
 	load_matrices(n,k);
 #endif
@@ -59,7 +62,7 @@ int main()
 #endif
 
 	/** Simulation Loop **/
-	for(s = 0; s <100; s++)
+	for(s = 0; s <10; s++)
 	{
 
 	message_gen(n,k,&seed,message);
@@ -67,6 +70,7 @@ int main()
 	BCH_s_enc(n,k, message, codeword);
 #endif
 
+	print( n,k, message, codeword, 100 );
 
 #ifdef NPARALLEL
 	BCHnclk_par(n,k);
@@ -77,28 +81,41 @@ int main()
 #endif
 
 
-	fprintf(stdout,"SIM #%d\n",s+1);
+	fprintf(stdout,"\nSIM #%d\n",s+1);
 
 #if defined (TESTDEC)
 	fprintf(o3,"\nSimulation #%d\nLocation of the pseudo-random errors:\n ",s+1);
 
 	// Random error pattern generator
-	for(i = 0; i < t(n,k)+DRIFT; i++){
+	for(i = 0; i < tVal; i++){
 		// bit flipping
 		seed2 = (s+1)*(i+1);
-		err[i] = (int)floor(n*uniform01(&seed2));
+		srand( seed2 ) ;
+		err[i] = (rand()%n+192)%n;
 		codeword[ err[i] ] ^= 1;
 		fprintf(o3,"%d\t",err[i]);
 	}
 	// Sort of the error locations in decreasing order:
 	// it will be useful to check the corrispondence with errors detected
-	elSort(t(n,k)+DRIFT, err);
+	elSort(tVal, err);
 #endif
 
-	if(error_detection(pow,index,t(n,k)+DRIFT, codeword) ) {
+	print( n,k, message, codeword, 100 );
+
+	if(error_detection(pow,index,tVal, codeword) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
 		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
-		BerlMass((t(n,k)+DRIFT)*2,pow,index, err, o3);
+		BerlMass(tVal*2,pow,index, el);
+
+		bool success = true;
+		fprintf(o3,"\nPosition of errors detected:\n");
+		for(i = 0; i <tVal*2; i++) {
+			if(el[i] != err[i]) {success=false;}
+			fprintf(o3,"%d\t",el[i]);
+		}
+		if(success) {fprintf(o3,"\nSuccessful decoding!");
+		fprintf(stdout,"\nSuccessful decoding!\n----------------------\n");};
+		fprintf(o3,"\n\n-------------------------------------");
 
 	}
 	else
