@@ -11,7 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\bch.cpp" />
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\bch.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C889E783-2B24-4557-86AB-20838FFF44FF}</ProjectGuid>
