@@ -755,7 +755,9 @@ int main()
 	// Random error pattern generator
 	for(i = 0; i < t(n,k)+DRIFT; i++){
 		// bit flipping
-		codeword[err[i] = (int)floor(n*uniform01(&seed2))] ^= 1;
+		seed2 = (s+1)*(i+1);
+		err[i] = (int)floor(n*uniform01(&seed2));
+		codeword[ err[i] ] ^= 1;
 		fprintf(o3,"%d\t",err[i]);
 	}
 	// Sort of the error locations in decreasing order:
