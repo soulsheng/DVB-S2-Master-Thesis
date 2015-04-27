@@ -24,7 +24,7 @@ public:
 protected:
 /*********************** PN bit source **************************************/
 int lfsr(unsigned long int *seed);
-
+#if 0
 /*********************** Loading matrices routine ***************************/
 void load_matrices(int n, int k);
 
@@ -40,7 +40,7 @@ void BCHnclk_par(int n,int k, int* message, int* codeword);
 
 /*********************** BCH parellel encoder k clock ticks *****************/
 void BCHkclk_par(int n,int k, int* message, int* codeword);
-
+#endif
 /*********************** Creation of GF(2^m)  *******************************/
 void gfField(int m, // Base 2 logarithm of cardinality of the Field
 	int poly// primitive polynomial of the Field in decimal form
@@ -84,6 +84,8 @@ private:
 	int n,k;
 	int *el;
 	int *reg;
+
+	int S[(MAXT + DRIFT)*2];          // Syndrome vector
 };
 
 #endif
