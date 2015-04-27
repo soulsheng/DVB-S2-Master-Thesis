@@ -667,6 +667,7 @@ bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
 }
 
 BCH_BM::BCH_BM()
+	:m(16)
 {
 	
 }
@@ -676,11 +677,9 @@ BCH_BM::~BCH_BM()
 	release();
 }
 
-void BCH_BM::initialize(int t, int m, FILE *o3)
+void BCH_BM::initialize(int t)
 {
 	this->t = t;
-	this->m = m;
-	this->o3 = o3;
 
 	// Allocation and initialization of the tables of the Galois Field
 	powAlpha = (int *)calloc((1<<m)-2, sizeof(int));
@@ -703,18 +702,17 @@ void BCH_BM::decode( int n, int k, int* messageRecv, int* codeword )
 {
 	if( error_detection(codeword) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
-		fprintf(o3,"\n\nErrors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
+
 		BerlMass();
 
 		bool success = true;
-		fprintf(o3,"\nPosition of errors detected:\n");
+		fprintf(stdout,"\nPosition of errors detected:\n");
 		for(int i = 0; i <t*2; i++) 
 			codeword[ el[i] ] ^= 1;
 
-		if(success) {fprintf(o3,"\nSuccessful decoding!");
+		if(success) {
 		fprintf(stdout,"\nSuccessful decoding!\n----------------------\n");};
-		fprintf(o3,"\n\n-------------------------------------");
-
+		
 	}
 	else
 		fprintf(stdout,"\n\nNo errors detected!\n------------------------------\n");

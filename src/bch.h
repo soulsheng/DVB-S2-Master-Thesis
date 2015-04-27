@@ -70,7 +70,7 @@ void message_gen(int n,int k, unsigned long int  *seed, int* message);
 
 public:
 
-void initialize(int t2, int m, FILE *o3);
+void initialize(int t);
 
 /*********************** Serial BCH encoder ********************************/
 void encode(int n, int k, int* message, int* codeword);
@@ -79,13 +79,12 @@ void decode(int n, int k, int* message, int* codeword);
 
 private:
 	int *powAlpha, *indexAlpha;
-	int m;
+	const int m;
 	int t;
 
 	int n,k;
 	int *el;
 
-	FILE* o3;
 };
 
 #endif
