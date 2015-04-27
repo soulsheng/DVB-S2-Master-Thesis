@@ -53,7 +53,7 @@ int main()
 	
 
 	BCH_BM	bch;
-	bch.initialize(tVal);
+	bch.initialize();
 
 #if defined (TESTDEC)
 	sprintf(outfile,"DecTest/outdec_%d_%d.txt",n,k);

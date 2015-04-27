@@ -99,7 +99,7 @@ void BCH_BM::encode(int n, int k, int* message, int* codeword)
 {
 
 	const unsigned int *g;
-	int *reg;
+	
 	int mem,app,i,j;
 
 /***************  Mode Selection (t-error-correction) ***********************/
@@ -107,21 +107,20 @@ void BCH_BM::encode(int n, int k, int* message, int* codeword)
 	switch(n-k) {
 	case 192:
 		g = gen12;
-		reg = (int*)calloc(n-k,sizeof(int));
 		break;
 	case 160:
 		g = gen10;
-		reg = (int*)calloc(n-k,sizeof(int));
 		break;
 	case 128:
 		g = gen8;
-		reg = (int*)calloc(n-k,sizeof(int));
 		break;
 	default:
 		fprintf(stdout,"Error:simulation aborted!\n");
 		fprintf(stdout,"Please insert a n-k couple provided by DVB-S2 FEC\n");
 		exit(0);
 	}
+	
+	memset( reg, 0, sizeof(int)*MAXR );
 
 /*********************** Encoding serial algorithm ********************************/
 /**************************   n clock ticks **************************************/
@@ -148,7 +147,6 @@ void BCH_BM::encode(int n, int k, int* message, int* codeword)
 	for (i=n-k-1; i >=0; i--)
 		codeword[i] = reg[i];
 
-	free(reg);
 }
 
 /****************************************************************************/
@@ -501,11 +499,11 @@ void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
 /*********************** Error detection   *******************************/
 /***************************************************************************/
 
-bool BCH_BM::error_detection(int* codeword)
+bool BCH_BM::error_detection( int n, int k, int* codeword)
 {
 
 	bool syn = false;
-	for(int i = 0; i < t*2; i++)
+	for(int i = 0; i < t(n,k)*2; i++)
 	{
 		S[i] = 0;
 		for(int j = 0; j < MAXN; j++){
@@ -526,11 +524,11 @@ bool BCH_BM::error_detection(int* codeword)
 /*********************** Error correction   *******************************/
 /***************************************************************************/
 
-void BCH_BM::BerlMass()
+void BCH_BM::BerlMass( int n, int k )
 
 {
-	int t2 = 2*t;
-	int k,L,l,i;
+	int t2 = 2*t(n,k);
+	int j,L,l,i;
 	int d, dm, tmp;
 	int *T, *c, *p, *lambda;
 	// Allocation and initialization
@@ -545,6 +543,7 @@ void BCH_BM::BerlMass()
 	// Error polynomial locator
 	lambda = (int*) calloc(t2,sizeof(int));
 
+	memset( el, -1, sizeof(int)*MAXT );
 
 	// Inizialization step
 	c[0] = 1;
@@ -554,16 +553,16 @@ void BCH_BM::BerlMass()
 	dm = 1;
 
 /*********** Berlekamp-Massey Algorithm *******************/
-	for (k = 0; k < t2; k++)
+	for (j = 0; j < t2; j++)
 	{
 		// Discrepancy computation
-		if(S[k] == -1)
+		if(S[j] == -1)
 			d = 0;
 		else
-			d = powAlpha[S[k]];
+			d = powAlpha[S[j]];
 		for(i = 1; i <= L;i++)
-			if(S[k-i] >= 0 && c[i] > 0)
-			d ^= powAlpha[(indexAlpha[c[i]]+ S[k-i])%MAXN];
+			if(S[j-i] >= 0 && c[i] > 0)
+			d ^= powAlpha[(indexAlpha[c[i]]+ S[j-i])%MAXN];
 			// exponential rule
 
 		if( d == 0)
@@ -572,7 +571,7 @@ void BCH_BM::BerlMass()
 		}
 		else
 		{
-			if(2*L > k)
+			if(2*L > j)
 			{
 				for( i = l; i <t2; i++)
 				{
@@ -590,7 +589,7 @@ void BCH_BM::BerlMass()
 					if(p[i-l] != 0)
 						c[i] ^= powAlpha[(indexAlpha[d]-indexAlpha[dm]+indexAlpha[p[i-l]]+MAXN)%MAXN];
 				}
-				L = k-L+1;
+				L = j-L+1;
 				for( i = 0; i < t2; i++)
 					p[i] = T[i];
 				dm = d;
@@ -613,15 +612,14 @@ void BCH_BM::BerlMass()
 /**************    Chien search   **************************/
 /*******************   Roots searching  ***********************/
 
-	int j;
-	k = 0;
+	int kk = 0;
 	for(i = 0; i < MAXN; i++)
 	{
 		for(j = 1, tmp = 0; j <=L; j++)
 			tmp ^= powAlpha[(lambda[j]+i*j)%MAXN];
 		if (tmp == 1)
 			// roots inversion give the error locations
-			el[k++] = (MAXN-i)%MAXN;
+			el[kk++] = (MAXN-i)%MAXN;
 
 	}
 	
@@ -669,18 +667,6 @@ bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
 BCH_BM::BCH_BM()
 	:m(16)
 {
-	
-}
-
-BCH_BM::~BCH_BM()
-{
-	release();
-}
-
-void BCH_BM::initialize(int t)
-{
-	this->t = t;
-
 	// Allocation and initialization of the tables of the Galois Field
 	powAlpha = (int *)calloc((1<<m)-2, sizeof(int));
 	indexAlpha = (int *)calloc((1<<m)-1, sizeof(int));
@@ -688,27 +674,40 @@ void BCH_BM::initialize(int t)
 	// Galois Field Creation
 	gfField(m, 32+8+4+1);
 
-	el = (int*) calloc(t*2,sizeof(int));
+}
+
+BCH_BM::~BCH_BM()
+{
+	release();
+}
+
+void BCH_BM::initialize()
+{
+	el = (int*) calloc(MAXT*2,sizeof(int));
+	reg = (int*)calloc(MAXR,sizeof(int));
 }
 
 void BCH_BM::release()
 {
 	//free(powAlpha);	free(indexAlpha);
 	free( el );
-
+	free( reg );
 }
 
 void BCH_BM::decode( int n, int k, int* messageRecv, int* codeword )
 {
-	if( error_detection(codeword) ) {
+	if( error_detection( n, k, codeword) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
 
-		BerlMass();
+		BerlMass( n, k );
 
 		bool success = true;
 		fprintf(stdout,"\nPosition of errors detected:\n");
-		for(int i = 0; i <t*2; i++) 
-			codeword[ el[i] ] ^= 1;
+		for(int i = 0; i <MAXT; i++) 
+		{
+			if ( -1 != el[i] )
+				codeword[ el[i] ] ^= 1;
+		}
 
 		if(success) {
 		fprintf(stdout,"\nSuccessful decoding!\n----------------------\n");};
