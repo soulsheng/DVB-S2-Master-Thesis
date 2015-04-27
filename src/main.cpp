@@ -21,6 +21,22 @@
 /*******************        MAIN FUNCTION       **************************/
 /*************************************************************************/
 
+enum	CODE_RATE_TAG
+{
+	RATE_1_4,	//	n = 16200; k=16008; t=12;
+	RATE_1_3,	//	n = 21600; k=21408; t=12;
+	RATE_2_5,	//	n = 25920; k=25728; t=12;
+	RATE_1_2,	//	n = 32400; k=32208; t=12;
+	RATE_3_5,	//	n = 38880; k=38688; t=12;
+	RATE_2_3,	//	n = 43200; k=43040; t=10;
+	RATE_3_4,	//	n = 48600; k=48408; t=12;
+	RATE_4_5,	//	n = 51840; k=51648; t=12;
+	RATE_5_6,	//	n = 54000; k=53840; t=10;
+	RATE_8_9,	//	n = 57600; k=57472; t=8;
+	RATE_9_10,	//	n = 58320; k=58192; t=8;
+	RATE_COUNT
+};
+
 int main()
 {
 
@@ -28,7 +44,7 @@ int main()
 	int codeword[MAXN]={0};			// codeword bits
 	int messageRecv[MAXN]={0};		// information received
 	int err[MAXT+DRIFT];          // array of random error location
-	FILE *o1, *o2, *o3;
+	FILE *o1, *o2;//, *o3;
 	int n,k,i,s;
 	unsigned long int seed;
 	long seed2;
@@ -38,27 +54,55 @@ int main()
 	//o1 = fopen("outserial.txt","w");
 	//o2 = fopen("outpnclk.txt","w");
 
-	n = 57600;  k = 57472;  //
-	n = 16200; k=16008; // n = 21600; k = 21408; // n = 43200; k = 43040;
-
-	int tVal = t(n,k) + DRIFT;
+	// n = 57600;  k = 57472;  //
+	// n = 16200; k=16008; // n = 21600; k = 21408; // n = 43200; k = 43040;
+	CODE_RATE_TAG code_rate = RATE_8_9;
+	switch( code_rate )
+	{
+		case RATE_1_4:	
+			n = 16200; k=16008;
+			break;
+		case RATE_1_3:	
+			n = 21600; k=21408; 
+			break;
+		case RATE_2_5:	
+			n = 25920; k=25728; 
+			break;
+		case RATE_1_2:	
+			n = 32400; k=32208; 
+			break;
+		case RATE_3_5:	
+			n = 38880; k=38688; 
+			break;
+		case RATE_2_3:	
+			n = 43200; k=43040; 
+			break;
+		case RATE_3_4:	
+			n = 48600; k=48408; 
+			break;
+		case RATE_4_5:	
+			n = 51840; k=51648; 
+			break;
+		case RATE_5_6:	
+			n = 54000; k=53840; 
+			break;
+		case RATE_8_9:	
+			n = 57600; k=57472; 
+			break;
+		case RATE_9_10:	
+			n = 58320; k=58192;
+			break;
+		default:
+			break;
+	}
 
 #ifndef SERIAL
 	load_matrices(n,k);
 #endif
-#if defined (TESTDEC)
-	sprintf(outfile,"DecTest/outdec_%d_%d.txt",n,k);
-	o3 = fopen(outfile,"w");
-#endif
-	
 
 	BCH_BM	bch;
 	bch.initialize();
 
-#if defined (TESTDEC)
-	sprintf(outfile,"DecTest/outdec_%d_%d.txt",n,k);
-	o3 = fopen(outfile,"w");
-#endif
 
 	/** Simulation Loop **/
 	for(s = 0; s <2; s++)
@@ -84,16 +128,16 @@ int main()
 	fprintf(stdout,"\nSIM #%d\n",s+1);
 
 #if defined (TESTDEC)
-	fprintf(o3,"\nSimulation #%d\nLocation of the pseudo-random errors:\n ",s+1);
+	fprintf(stdout,"\nSimulation #%d\nLocation of the pseudo-random errors:\n ",s+1);
 
 	// Random error pattern generator
-	for(i = 0; i < tVal; i++){
+	for(i = 0; i < t(n,k) + DRIFT; i++){
 		// bit flipping
 		seed2 = (s+1)*(i+1);
 		srand( seed2 ) ;
-		err[i] = (rand()%n+192)%n;
+		err[i] = rand()%k+n-k;
 		codeword[ err[i] ] ^= 1;
-		fprintf(o3,"%d\t",err[i]);
+		fprintf(stdout,"%d\t",err[i]);
 	}
 
 #endif

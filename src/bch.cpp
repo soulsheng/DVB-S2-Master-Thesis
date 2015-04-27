@@ -706,7 +706,10 @@ void BCH_BM::decode( int n, int k, int* messageRecv, int* codeword )
 		for(int i = 0; i <MAXT; i++) 
 		{
 			if ( -1 != el[i] )
+			{
 				codeword[ el[i] ] ^= 1;
+				fprintf(stdout,"%d\t",el[i]);
+			}
 		}
 
 		if(success) {
