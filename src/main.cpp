@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include <bch.h>
+#include <bch_bm.h>
 
 
 

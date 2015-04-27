@@ -8,7 +8,7 @@
 #include <fstream>
 #include <math.h>
 
-#include "bch.h"
+#include "bch_bm.h"
 
 #if 0
 /****************************************************************************/

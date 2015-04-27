@@ -18,13 +18,13 @@
     <ClCompile Include="src\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\bch.cpp">
+    <ClCompile Include="src\bch_bm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\bch.h">
-      <Filter>源文件</Filter>
+    <ClInclude Include="src\bch_bm.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
