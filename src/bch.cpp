@@ -95,7 +95,7 @@ const unsigned int gen8[] =
 /*********************** Serial BCH encoder ********************************/
 /***************************************************************************/
 
-void BCH_BM::BCH_s_enc(int n, int k, int* message, int* codeword)
+void BCH_BM::encode(int n, int k, int* message, int* codeword)
 {
 
 	const unsigned int *g;
@@ -632,36 +632,6 @@ void BCH_BM::BerlMass()
 }
 
 
-
-// Random variable uniformly distributed between 0.0 and 1.0
-double BCH_BM::uniform01(long *pSeed )
-{
-	srand( *pSeed ) ;
-	return (double)rand()/(double)RAND_MAX;
-}
-
-/****************************************************************************/
-/*********************** Insertion sort  *******************************/
-/***************************************************************************/
-
-void BCH_BM::elSort(int dim, int* err)
-{
-	int i, j;
-	int key;
-
-	for ( i = 1; i < dim; i++)
-     {
-         key = err[i];
-         j = i - 1;
-         while (err[j] < key && j >=0) {
-			 err[j+1] = err[j];
-			 j--;
-		}
-		err[j+1] = key;
-	}
-
-}
-
 /*********************** print msg and code  *******************************/
 void BCH_BM::printNK( int n,int k, int* message, int* codeword, int length )
 {
@@ -696,11 +666,9 @@ bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
 	return bSuccess;
 }
 
-BCH_BM::BCH_BM(int t, int m, FILE *o3)
+BCH_BM::BCH_BM()
 {
-	this->t = t;
-	this->m = m;
-	this->o3 = o3;
+	
 }
 
 BCH_BM::~BCH_BM()
@@ -708,8 +676,11 @@ BCH_BM::~BCH_BM()
 	release();
 }
 
-void BCH_BM::initialize()
+void BCH_BM::initialize(int t, int m, FILE *o3)
 {
+	this->t = t;
+	this->m = m;
+	this->o3 = o3;
 
 	// Allocation and initialization of the tables of the Galois Field
 	powAlpha = (int *)calloc((1<<m)-2, sizeof(int));

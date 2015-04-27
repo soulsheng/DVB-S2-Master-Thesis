@@ -52,8 +52,8 @@ int main()
 #endif
 	
 
-	BCH_BM	bch(tVal, 16, o3);
-	bch.initialize();
+	BCH_BM	bch;
+	bch.initialize(tVal, 16, o3);
 
 #if defined (TESTDEC)
 	sprintf(outfile,"DecTest/outdec_%d_%d.txt",n,k);
@@ -66,7 +66,7 @@ int main()
 
 	bch.message_gen(n,k,&seed,message);
 #ifdef SERIAL
-	bch.BCH_s_enc(n,k, message, codeword);
+	bch.encode(n,k, message, codeword);
 #endif
 
 	std::cout << "init msg & code: " << std::endl;
@@ -95,9 +95,7 @@ int main()
 		codeword[ err[i] ] ^= 1;
 		fprintf(o3,"%d\t",err[i]);
 	}
-	// Sort of the error locations in decreasing order:
-	// it will be useful to check the corrispondence with errors detected
-	bch.elSort(tVal, err);
+
 #endif
 
 	std::cout << "add error to code: " << std::endl;
