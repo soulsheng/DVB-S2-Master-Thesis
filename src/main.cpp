@@ -105,6 +105,9 @@ int main()
 
 	bch.decode(n,k, messageRecv, codeword);
 
+	std::cout << "decode: " << std::endl;
+	bch.printNK( n,k, message, codeword, 100 );
+
 	bool	bRight = bch.verifyResult(n,k, message, messageRecv);
 	if ( bRight )
 		std::cout << s+1 << "# message recovered!" << std::endl << std::endl;
