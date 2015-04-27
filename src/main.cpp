@@ -6,10 +6,6 @@
 
 #include <bch.h>
 
-#ifndef TESTENC
-#define TESTDEC
-#define SERIAL
-#endif
 
 
 
@@ -96,9 +92,6 @@ int main()
 			break;
 	}
 
-#ifndef SERIAL
-	load_matrices(n,k);
-#endif
 
 	BCH_BM	bch;
 	bch.initialize();
@@ -109,25 +102,16 @@ int main()
 	{
 
 	bch.message_gen(n,k,&seed,message);
-#ifdef SERIAL
+
 	bch.encode(n,k, message, codeword);
-#endif
 
 	std::cout << "init msg & code: " << std::endl;
 	bch.printNK( n,k, message, codeword, 100 );
 
-#ifdef NPARALLEL
-	BCHnclk_par(n,k);
-#endif
-
-#ifdef KPARALLEL
-	BCHkclk_par(n,k);
-#endif
-
 
 	fprintf(stdout,"\nSIM #%d\n",s+1);
 
-#if defined (TESTDEC)
+
 	fprintf(stdout,"\nSimulation #%d\nLocation of the pseudo-random errors:\n ",s+1);
 
 	// Random error pattern generator
@@ -140,7 +124,6 @@ int main()
 		fprintf(stdout,"%d\t",err[i]);
 	}
 
-#endif
 
 	std::cout << "add error to code: " << std::endl;
 	bch.printNK( n,k, message, codeword, 100 );
