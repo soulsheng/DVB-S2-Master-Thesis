@@ -71,26 +71,26 @@ void gfField(int m, // Base 2 logarithm of cardinality of the Field
 	int* indexAlpha);
 
 /*********************** Error detection   *******************************/
-bool error_detection( int n, int k, char* codeword);
+bool error_detection(char* codeword);
 
 /*********************** Error correction   *******************************/
-void BerlMass( int n, int k );
+void BerlMass();
 
 /*********************** final step of BCH decoder ********************************/
-void BCH_final_dec(int n, int k, char* message, char* codeword);
+void BCH_final_dec(char* message, char* codeword);
 
 void release();
 
 public:
 
 /*********************** print msg and code  *******************************/
-void printNK(int n,int k, char* message, char* codeword, int length);
+void printNK(char* message, char* codeword, int length);
 
 /*********************** verify result  *******************************/
-bool verifyResult(int n, int k, char* message, char* messageRef);
+bool verifyResult(char* message, char* messageRef);
 
 /*********************** Message generator **********************************/
-void message_gen(int n,int k, unsigned long int  *seed, char* message);
+void message_gen(unsigned long int  *seed, char* message);
 
 public:
 
@@ -102,9 +102,9 @@ int getN( );
 int getK( );
 
 /*********************** Serial BCH encoder ********************************/
-void encode(int n, int k, char* message, char* codeword);
+void encode(char* message, char* codeword);
 
-void decode(int n, int k, char* message, char* codeword);
+void decode(char* message, char* codeword);
 
 private:
 	int *powAlphaNormal, *indexAlphaNormal;

@@ -54,12 +54,12 @@ int main()
 	n = bch.getN();
 	k = bch.getK();
 
-	bch.message_gen(n,k,&seed,message);
+	bch.message_gen(&seed,message);
 
-	bch.encode(n,k, message, codeword);
+	bch.encode(message, codeword);
 
 	std::cout << "init msg & code: " << std::endl;
-	bch.printNK( n,k, message, codeword, 100 );
+	bch.printNK( message, codeword, 100 );
 
 
 	fprintf(stdout,"\nSIM #%d\n",s+1);
@@ -84,14 +84,14 @@ int main()
 
 
 	std::cout << "add error to code: " << std::endl;
-	bch.printNK( n,k, message, codeword, 100 );
+	bch.printNK( message, codeword, 100 );
 
-	bch.decode(n,k, messageRecv, codeword);
+	bch.decode(messageRecv, codeword);
 
 	std::cout << "decode: " << std::endl;
-	bch.printNK( n,k, message, codeword, 100 );
+	bch.printNK( message, codeword, 100 );
 
-	bool	bRight = bch.verifyResult(n,k, message, messageRecv);
+	bool	bRight = bch.verifyResult(message, messageRecv);
 	if ( bRight )
 		std::cout << s+1 << "# message recovered!" << std::endl << std::endl;
 	else
