@@ -17,21 +17,6 @@
 /*******************        MAIN FUNCTION       **************************/
 /*************************************************************************/
 
-enum	CODE_RATE_TAG
-{
-	RATE_1_4,	//	n = 16200; k=16008; t=12;
-	RATE_1_3,	//	n = 21600; k=21408; t=12;
-	RATE_2_5,	//	n = 25920; k=25728; t=12;
-	RATE_1_2,	//	n = 32400; k=32208; t=12;
-	RATE_3_5,	//	n = 38880; k=38688; t=12;
-	RATE_2_3,	//	n = 43200; k=43040; t=10;
-	RATE_3_4,	//	n = 48600; k=48408; t=12;
-	RATE_4_5,	//	n = 51840; k=51648; t=12;
-	RATE_5_6,	//	n = 54000; k=53840; t=10;
-	RATE_8_9,	//	n = 57600; k=57472; t=8;
-	RATE_9_10,	//	n = 58320; k=58192; t=8;
-	RATE_COUNT
-};
 
 int main()
 {
@@ -53,45 +38,8 @@ int main()
 	// n = 57600;  k = 57472;  //
 	// n = 16200; k=16008; // n = 21600; k = 21408; // n = 43200; k = 43040;
 	CODE_RATE_TAG code_rate = RATE_8_9;
-	switch( code_rate )
-	{
-		case RATE_1_4:	
-			n = 16200; k=16008;
-			break;
-		case RATE_1_3:	
-			n = 21600; k=21408; 
-			break;
-		case RATE_2_5:	
-			n = 25920; k=25728; 
-			break;
-		case RATE_1_2:	
-			n = 32400; k=32208; 
-			break;
-		case RATE_3_5:	
-			n = 38880; k=38688; 
-			break;
-		case RATE_2_3:	
-			n = 43200; k=43040; 
-			break;
-		case RATE_3_4:	
-			n = 48600; k=48408; 
-			break;
-		case RATE_4_5:	
-			n = 51840; k=51648; 
-			break;
-		case RATE_5_6:	
-			n = 54000; k=53840; 
-			break;
-		case RATE_8_9:	
-			n = 57600; k=57472; 
-			break;
-		case RATE_9_10:	
-			n = 58320; k=58192;
-			break;
-		default:
-			break;
-	}
 
+	CODE_TYPE_TAG code_type = CODE_TYPE_NORMAL;
 
 	BCH_BM	bch;
 	bch.initialize();
@@ -100,6 +48,11 @@ int main()
 	/** Simulation Loop **/
 	for(s = 0; s <2; s++)
 	{
+	
+	bch.setCode( code_rate, code_type );
+
+	n = bch.getN();
+	k = bch.getK();
 
 	bch.message_gen(n,k,&seed,message);
 
@@ -114,8 +67,13 @@ int main()
 
 	fprintf(stdout,"\nSimulation #%d\nLocation of the pseudo-random errors:\n ",s+1);
 
+	int tCapacity = 0;
+	if ( code_type == CODE_TYPE_NORMAL )
+		tCapacity = t(n,k) + DRIFT;
+	else
+		tCapacity = 12 + DRIFT;
 	// Random error pattern generator
-	for(i = 0; i < t(n,k) + DRIFT; i++){
+	for(i = 0; i < tCapacity; i++){
 		// bit flipping
 		seed2 = (s+1)*(i+1);
 		srand( seed2 ) ;

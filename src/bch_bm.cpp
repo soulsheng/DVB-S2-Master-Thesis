@@ -83,6 +83,16 @@ const unsigned int gen8[] =
  1,1,1,1,1,0,1,0,1,0,1,0,0,1,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,
  1};
 
+
+const unsigned int gen12_s[] = 
+{1,0,1,0,0,1,0,1,1,0,1,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,1,0,1,1,
+1,1,1,0,1,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,0,0,1,0,1,0,0,1,0,1,0,
+1,0,0,1,0,1,1,0,0,0,0,0,1,0,0,1,1,1,0,0,0,1,0,1,1,1,0,0,0,1,0,0,
+1,0,1,1,0,0,1,1,0,1,0,0,0,1,1,0,0,1,0,0,1,1,0,1,1,0,0,1,0,1,1,0,
+0,0,0,1,1,0,0,1,0,1,0,1,0,1,1,1,1,1,0,1,1,0,1,1,0,1,0,0,0,1,1,0,
+0,0,0,0,0,0,1,0,
+1};	// short frame
+
 /****************************************************************************/
 /*********************** Serial BCH encoder ********************************/
 /***************************************************************************/
@@ -105,6 +115,9 @@ void BCH_BM::encode(int n, int k, int* message, int* codeword)
 		break;
 	case 128:
 		g = gen8;
+		break;
+	case 168:
+		g = gen12_s;
 		break;
 	default:
 		fprintf(stdout,"Error:simulation aborted!\n");
@@ -714,4 +727,100 @@ void BCH_BM::decode( int n, int k, int* messageRecv, int* codeword )
 
 	BCH_final_dec(n,k, messageRecv, codeword);
 
+}
+
+void BCH_BM::setCode( CODE_RATE_TAG rate, CODE_TYPE_TAG type )
+{
+	code_rate = rate;
+	code_type = type;
+
+	if( CODE_TYPE_NORMAL == code_type ) {
+		switch( code_rate )
+		{
+		case RATE_1_4:	
+			n = 16200; k=16008;
+			break;
+		case RATE_1_3:	
+			n = 21600; k=21408; 
+			break;
+		case RATE_2_5:	
+			n = 25920; k=25728; 
+			break;
+		case RATE_1_2:	
+			n = 32400; k=32208; 
+			break;
+		case RATE_3_5:	
+			n = 38880; k=38688; 
+			break;
+		case RATE_2_3:	
+			n = 43200; k=43040; 
+			break;
+		case RATE_3_4:	
+			n = 48600; k=48408; 
+			break;
+		case RATE_4_5:	
+			n = 51840; k=51648; 
+			break;
+		case RATE_5_6:	
+			n = 54000; k=53840; 
+			break;
+		case RATE_8_9:	
+			n = 57600; k=57472; 
+			break;
+		case RATE_9_10:	
+			n = 58320; k=58192;
+			break;
+		default:
+			break;
+		}// switch
+	}// if normal
+	else	// short
+	{
+		switch( code_rate )
+		{
+		case RATE_1_4:	
+			n = 3240; k=3072;
+			break;
+		case RATE_1_3:	
+			n = 5400; k=5232; 
+			break;
+		case RATE_2_5:	
+			n = 6480; k=6312; 
+			break;
+		case RATE_1_2:	
+			n = 7200; k=7032; 
+			break;
+		case RATE_3_5:	
+			n = 9720; k=9552; 
+			break;
+		case RATE_2_3:	
+			n = 10800; k=10632; 
+			break;
+		case RATE_3_4:	
+			n = 11880; k=11712; 
+			break;
+		case RATE_4_5:	
+			n = 12600; k=12432; 
+			break;
+		case RATE_5_6:	
+			n = 13320; k=13152; 
+			break;
+		case RATE_8_9:	
+			n = 14400; k=14232; 
+			break;
+		default:
+			break;
+		}// switch
+	}// else short
+
+}
+
+int BCH_BM::getN( )
+{
+	return n;
+}
+
+int BCH_BM::getK( )
+{
+	return k;
 }
