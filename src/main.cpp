@@ -37,9 +37,9 @@ int main()
 
 	// n = 57600;  k = 57472;  //
 	// n = 16200; k=16008; // n = 21600; k = 21408; // n = 43200; k = 43040;
-	CODE_RATE_TAG code_rate = RATE_8_9;
+	CODE_RATE code_rate = C8_9;
 
-	CODE_TYPE_TAG code_type = CODE_TYPE_SHORT;
+	FRAME_TYPE code_type = FECFRAME_SHORT;
 
 	BCH_BM	bch;
 	bch.initialize();
@@ -68,7 +68,7 @@ int main()
 	fprintf(stdout,"\nSimulation #%d\nLocation of the pseudo-random errors:\n ",s+1);
 
 	int tCapacity = 0;
-	if ( code_type == CODE_TYPE_NORMAL )
+	if ( code_type == FECFRAME_NORMAL )
 		tCapacity = t(n,k) + DRIFT;
 	else
 		tCapacity = 12 + DRIFT;

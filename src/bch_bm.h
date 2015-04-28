@@ -15,26 +15,26 @@
 #define DRIFT 0 // adding extra errors
 
 
-enum	CODE_RATE_TAG
+enum	CODE_RATE
 {
-	RATE_1_4,	//	n = 16200; k=16008; t=12;
-	RATE_1_3,	//	n = 21600; k=21408; t=12;
-	RATE_2_5,	//	n = 25920; k=25728; t=12;
-	RATE_1_2,	//	n = 32400; k=32208; t=12;
-	RATE_3_5,	//	n = 38880; k=38688; t=12;
-	RATE_2_3,	//	n = 43200; k=43040; t=10;
-	RATE_3_4,	//	n = 48600; k=48408; t=12;
-	RATE_4_5,	//	n = 51840; k=51648; t=12;
-	RATE_5_6,	//	n = 54000; k=53840; t=10;
-	RATE_8_9,	//	n = 57600; k=57472; t=8;
-	RATE_9_10,	//	n = 58320; k=58192; t=8;
-	RATE_COUNT
+	C1_4,	//	n = 16200; k=16008; t=12;
+	C1_3,	//	n = 21600; k=21408; t=12;
+	C2_5,	//	n = 25920; k=25728; t=12;
+	C1_2,	//	n = 32400; k=32208; t=12;
+	C3_5,	//	n = 38880; k=38688; t=12;
+	C2_3,	//	n = 43200; k=43040; t=10;
+	C3_4,	//	n = 48600; k=48408; t=12;
+	C4_5,	//	n = 51840; k=51648; t=12;
+	C5_6,	//	n = 54000; k=53840; t=10;
+	C8_9,	//	n = 57600; k=57472; t=8;
+	C9_10,	//	n = 58320; k=58192; t=8;
+	CCOUNT
 };
 
-enum	CODE_TYPE_TAG
+enum	FRAME_TYPE
 {
-	CODE_TYPE_NORMAL,
-	CODE_TYPE_SHORT
+	FECFRAME_NORMAL,
+	FECFRAME_SHORT
 };
 
 class BCH_BM
@@ -96,7 +96,7 @@ public:
 
 void initialize();
 
-void setCode( CODE_RATE_TAG rate, CODE_TYPE_TAG type );
+void setCode( CODE_RATE rate, FRAME_TYPE type );
 
 int getN( );
 int getK( );
@@ -123,8 +123,8 @@ private:
 
 	int S[(MAXT + DRIFT)*2];          // Syndrome vector
 
-	CODE_RATE_TAG	code_rate; 
-	CODE_TYPE_TAG	code_type; 
+	CODE_RATE	code_rate; 
+	FRAME_TYPE	code_type; 
 };
 
 #endif
