@@ -10,7 +10,7 @@
 
 #define MAXR 192 // max r bits
 #define P 8      // degree of parallelism
-#define MAXN ((1<<16)-1)  // primitive code length
+//#define MAXN ((1<<16)-1)  // primitive code length
 #define MAXT 12         // Max corrective capacity
 #define DRIFT 0 // adding extra errors
 
@@ -66,8 +66,9 @@ void BCHkclk_par(int n,int k, int* message, int* codeword);
 #endif
 /*********************** Creation of GF(2^m)  *******************************/
 void gfField(int m, // Base 2 logarithm of cardinality of the Field
-	int poly// primitive polynomial of the Field in decimal form
-	);
+	int poly, // primitive polynomial of the Field in decimal form
+	int* powAlpha,
+	int* indexAlpha);
 
 /*********************** Error detection   *******************************/
 bool error_detection( int n, int k, int* codeword);
@@ -106,8 +107,15 @@ void encode(int n, int k, int* message, int* codeword);
 void decode(int n, int k, int* message, int* codeword);
 
 private:
+	int *powAlphaNormal, *indexAlphaNormal;
+	const int mNormal;
+
+	int *powAlphaShort, *indexAlphaShort;
+	const int mShort;
+
 	int *powAlpha, *indexAlpha;
-	const int m;
+	int m;
+	int MAXN;
 
 	int n,k;
 	int *el;

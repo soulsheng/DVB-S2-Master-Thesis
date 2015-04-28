@@ -469,8 +469,9 @@ void BCH_BM::BCHkclk_par(int n,int k, int* message, int* codeword)
 /***************************************************************************/
 
 void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
-			 int poly // primitive polynomial of the Field in decimal form
-			 )
+			 int poly, // primitive polynomial of the Field in decimal form
+			 int* powAlpha,
+			 int* indexAlpha)
 {
 	int reg,	// this integer of 32 bits, masked by a sequence of m ones,
 				// contains the elements of Galois Field
@@ -506,12 +507,17 @@ void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
 
 bool BCH_BM::error_detection( int n, int k, int* codeword)
 {
+	int tCapacity = 0;
+	if ( code_type == CODE_TYPE_NORMAL )
+		tCapacity = t(n,k) + DRIFT;
+	else
+		tCapacity = 12 + DRIFT;
 
 	bool syn = false;
-	for(int i = 0; i < t(n,k)*2; i++)
+	for(int i = 0; i < tCapacity*2; i++)
 	{
 		S[i] = 0;
-		for(int j = 0; j < MAXN; j++){
+		for(int j = 0; j < n; j++){
 			if(codeword[j])
 				S[i] ^= powAlpha[((i+1)*j)%MAXN];
 		}
@@ -532,7 +538,13 @@ bool BCH_BM::error_detection( int n, int k, int* codeword)
 void BCH_BM::BerlMass( int n, int k )
 
 {
-	int t2 = 2*t(n,k);
+	int tCapacity = 0;
+	if ( code_type == CODE_TYPE_NORMAL )
+		tCapacity = t(n,k) + DRIFT;
+	else
+		tCapacity = 12 + DRIFT;
+
+	int t2 = 2*tCapacity;
 	int j,L,l,i;
 	int d, dm, tmp;
 	int *T, *c, *p, *lambda;
@@ -670,14 +682,20 @@ bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
 }
 
 BCH_BM::BCH_BM()
-	:m(16)
+	:mNormal(16), mShort(14)
 {
 	// Allocation and initialization of the tables of the Galois Field
-	powAlpha = (int *)calloc((1<<m)-2, sizeof(int));
-	indexAlpha = (int *)calloc((1<<m)-1, sizeof(int));
+	powAlphaNormal = (int *)calloc((1<<mNormal)-2, sizeof(int));
+	indexAlphaNormal = (int *)calloc((1<<mNormal)-1, sizeof(int));
 
 	// Galois Field Creation
-	gfField(m, 32+8+4+1);
+	gfField(mNormal, 32+8+4+1, powAlphaNormal, indexAlphaNormal);
+
+	powAlphaShort = (int *)calloc((1<<mShort)-2, sizeof(int));
+	indexAlphaShort = (int *)calloc((1<<mShort)-1, sizeof(int));
+
+	// Galois Field Creation
+	gfField(mShort, 32+8+2+1, powAlphaShort, indexAlphaShort);
 
 }
 
@@ -773,6 +791,11 @@ void BCH_BM::setCode( CODE_RATE_TAG rate, CODE_TYPE_TAG type )
 		default:
 			break;
 		}// switch
+
+		m = 16;
+		powAlpha = powAlphaNormal;
+		indexAlpha = indexAlphaNormal;
+
 	}// if normal
 	else	// short
 	{
@@ -811,8 +834,14 @@ void BCH_BM::setCode( CODE_RATE_TAG rate, CODE_TYPE_TAG type )
 		default:
 			break;
 		}// switch
+
+		m = 14;
+		powAlpha = powAlphaShort;
+		indexAlpha = indexAlphaShort;
+
 	}// else short
 
+	MAXN = (1<<m)-1;
 }
 
 int BCH_BM::getN( )

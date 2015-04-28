@@ -21,9 +21,9 @@
 int main()
 {
 
-	int message[MAXN];				// information bits
-	int codeword[MAXN]={0};			// codeword bits
-	int messageRecv[MAXN]={0};		// information received
+	int message[65535];				// information bits
+	int codeword[65535]={0};			// codeword bits
+	int messageRecv[65535]={0};		// information received
 	int err[MAXT+DRIFT];          // array of random error location
 	FILE *o1, *o2;//, *o3;
 	int n,k,i,s;
@@ -39,7 +39,7 @@ int main()
 	// n = 16200; k=16008; // n = 21600; k = 21408; // n = 43200; k = 43040;
 	CODE_RATE_TAG code_rate = RATE_8_9;
 
-	CODE_TYPE_TAG code_type = CODE_TYPE_NORMAL;
+	CODE_TYPE_TAG code_type = CODE_TYPE_SHORT;
 
 	BCH_BM	bch;
 	bch.initialize();
