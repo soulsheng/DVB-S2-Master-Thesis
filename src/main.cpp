@@ -21,9 +21,9 @@
 int main()
 {
 
-	int message[65535];				// information bits
-	int codeword[65535]={0};			// codeword bits
-	int messageRecv[65535]={0};		// information received
+	char message[65535];				// information bits
+	char codeword[65535]={0};			// codeword bits
+	char messageRecv[65535]={0};		// information received
 	int err[MAXT+DRIFT];          // array of random error location
 	FILE *o1, *o2;//, *o3;
 	int n,k,i,s;

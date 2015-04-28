@@ -42,7 +42,7 @@ int BCH_BM::lfsr(unsigned long int *seed)
 /*********************** Message generator **********************************/
 /***************************************************************************/
 
-void BCH_BM::message_gen(int n,int k, unsigned long int  *seed, int* message)
+void BCH_BM::message_gen(int n,int k, unsigned long int  *seed, char* message)
 {
 	int i;
     // Message bits pseudo random generation
@@ -97,7 +97,7 @@ const unsigned int gen12_s[] =
 /*********************** Serial BCH encoder ********************************/
 /***************************************************************************/
 
-void BCH_BM::encode(int n, int k, int* message, int* codeword)
+void BCH_BM::encode(int n, int k, char* message, char* codeword)
 {
 
 	const unsigned int *g;
@@ -505,7 +505,7 @@ void BCH_BM::gfField(int m, // Base 2 logarithm of cardinality of the Field
 /*********************** Error detection   *******************************/
 /***************************************************************************/
 
-bool BCH_BM::error_detection( int n, int k, int* codeword)
+bool BCH_BM::error_detection( int n, int k, char* codeword)
 {
 	int tCapacity = 0;
 	if ( code_type == FECFRAME_NORMAL )
@@ -648,27 +648,27 @@ void BCH_BM::BerlMass( int n, int k )
 
 
 /*********************** print msg and code  *******************************/
-void BCH_BM::printNK( int n,int k, int* message, int* codeword, int length )
+void BCH_BM::printNK( int n,int k, char* message, char* codeword, int length )
 {
 	std::cout << std::endl << "msg:" << std::endl;
 	int nMax = n-k+length-1;
 	for (int i=nMax;i>=n-k;i--)
-		std::cout << message[i] << " ";
+		std::cout << (int)message[i] << " ";
 
 	std::cout << std::endl << "code:" << std::endl;
 	for (int i=nMax;i>=n-k;i--)
-		std::cout << codeword[i] << " ";
+		std::cout << (int)codeword[i] << " ";
 
 	std::cout << std::endl;
 }
 
-void BCH_BM::BCH_final_dec( int n, int k, int* message, int* codeword )
+void BCH_BM::BCH_final_dec( int n, int k, char* message, char* codeword )
 {
 	for (int i=n-1;i>=n-k;i--)
 		message[i] = codeword[i];
 }
 
-bool BCH_BM::verifyResult( int n, int k, int* message, int* messageRef )
+bool BCH_BM::verifyResult( int n, int k, char* message, char* messageRef )
 {
 	bool bSuccess = true;
 	for (int i=n-1;i>=n-k;i--)	{
@@ -717,7 +717,7 @@ void BCH_BM::release()
 	free( reg );
 }
 
-void BCH_BM::decode( int n, int k, int* messageRecv, int* codeword )
+void BCH_BM::decode( int n, int k, char* messageRecv, char* codeword )
 {
 	if( error_detection( n, k, codeword) ) {
 		fprintf(stdout,"Errors detected!\nDecoding by Berlekamp-Massey algorithm.....\n");
